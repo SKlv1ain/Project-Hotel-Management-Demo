@@ -1,27 +1,87 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Room Booking Calendar</title>
+    <title>Booking Calendar</title>
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar/main.min.css" rel="stylesheet">
+    <!-- Bootstrap for better layout -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .booked { background-color: red; color: white; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 900px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        #calendar {
+            margin-top: 20px;
+        }
+        .no-bookings {
+            text-align: center;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+        .back-button {
+            margin-bottom: 20px;
+        }
     </style>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar/main.min.js"></script>
 </head>
 <body>
-    <h1>Room Booking Calendar for {{ room.name }}</h1>
-    <table>
-        <tr>
-            <th>Date</th>
-            <th>Status</th>
-        </tr>
-        {% for booking in booked_dates %}
-        <tr>
-            <td>{{ booking.start }} to {{ booking.end }}</td>
-            <td class="booked">{{ booking.title }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="2">No bookings yet.</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container">
+        <!-- Back to Room List Button -->
+        <a href="{% url 'room_list' %}" class="btn btn-primary back-button">← Back to Room List</a>
+        
+        <!-- Calendar Header -->
+        <h1 class="text-center">Booking Calendar for {{ room.room_type }}</h1>
+
+        <!-- Calendar Content -->
+        {% if booked_dates %}
+        <div id="calendar"></div>
+        {% else %}
+        <p class="no-bookings">No bookings available for this room.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if booked_dates is available
+            {% if booked_dates %}
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                    start: 'prev,next today', // Left buttons
+                    center: 'title', // Center title
+                    end: 'dayGridMonth,timeGridWeek,timeGridDay' // Right view options
+                },
+                initialView: 'dayGridMonth', // Default view
+                events: {{ booked_dates|safe }}, // Load bookings
+                height: 'auto', // Adjust calendar height
+                editable: false, // Disable event editing
+                eventColor: '#3788d8', // Customize event color
+                eventTextColor: '#ffffff', // Event text color
+            });
+            calendar.render();
+            {% endif %}
+        });
+    </script>
+
+    <!-- Optional: Bootstrap JS (for potential modal usage in the future) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

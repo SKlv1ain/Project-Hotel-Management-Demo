@@ -57,17 +57,20 @@ def dashboard(request):
 from .models import Booking
 
 def room_list(request):
-    status_filter = request.GET.get('status', 'all')
-    search_query = request.GET.get('search', '')
-    sort_by = request.GET.get('sort_by', '')
+    # Get filter parameters from the request
+    status_filter = request.GET.get('status', 'all')  # Default to 'all'
+    search_query = request.GET.get('search', '')  # Get the search query for Room ID or Room Type
 
+    # Start with all rooms
     rooms = Room.objects.all()
 
+    # Apply search filter for Room ID or Room Type if provided
     if search_query:
         rooms = rooms.filter(
             id__icontains=search_query
         ) | rooms.filter(room_type__icontains=search_query)
 
+    # Apply status filter
     if status_filter == 'available':
         rooms = rooms.filter(status='available')
     elif status_filter == 'booked':
@@ -75,21 +78,23 @@ def room_list(request):
     elif status_filter == 'pending':
         rooms = rooms.filter(status='pending')
 
-    if sort_by == 'price_asc':
-        rooms = rooms.order_by('price_per_night')
-    elif sort_by == 'price_desc':
-        rooms = rooms.order_by('-price_per_night')
+    # Count for each status dynamically
+    status_counts = {
+        'all': Room.objects.count(),
+        'available': Room.objects.filter(status='available').count(),
+        'booked': Room.objects.filter(status='booked').count(),
+        'pending': Room.objects.filter(status='pending').count(),
+    }
 
-    # Fetch all bookings for the calendar
-    bookings = Booking.objects.all()
-
+    # Pass context to the template
     context = {
         'rooms': rooms,
         'status_filter': status_filter,
         'search_query': search_query,
-        'bookings': bookings,  # Pass bookings to the template
+        'status_counts': status_counts,
     }
     return render(request, 'core/room_list.html', context)
+
 
 
 
@@ -133,6 +138,8 @@ def room_detail(request, room_id):
 def booking_list(request):
     bookings = Booking.objects.all()
     return render(request, 'booking_list.html', {'bookings': bookings})
+
+
 
 def new_booking(request):
     if request.method == 'POST':
@@ -294,19 +301,16 @@ def room_calendar_view(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     bookings = Booking.objects.filter(room=room, status='confirmed')
 
-    # Debugging: Print out the bookings and booked dates
-    print(bookings)  # Check in the console
+    # Prepare booked dates for the calendar
     booked_dates = [
         {
             "start": booking.check_in_date.strftime('%Y-%m-%d'),
-            "end": (booking.check_out_date + timezone.timedelta(days=1)).strftime('%Y-%m-%d'),
-            "title": f"Booked by {booking.customer.first_name} {booking.customer.last_name}"
+            "end": (booking.check_out_date).strftime('%Y-%m-%d'),  # Include end date
+            "title": f"Booked by {booking.customer.first_name} {booking.customer.last_name}",
         }
         for booking in bookings
     ]
-    
-    # Debugging: Print out the booked dates
-    print(booked_dates)  # Check in the console
+
 
     context = {
         "room": room,

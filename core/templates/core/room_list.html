@@ -63,7 +63,9 @@
                     <div class="mb-3">
                         <label for="status" class="form-label">Filter by Status</label>
                         <select name="status" id="status" class="form-select">
-                            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>
+                                All ({{ status_counts.all }})
+                            </option>
                             <option value="available" {% if status_filter == 'available' %}selected{% endif %}>
                                 Available ({{ status_counts.available }})
                             </option>
@@ -75,17 +77,19 @@
                             </option>
                         </select>
                     </div>
+                    
                     <button type="submit" class="btn btn-primary w-100">Apply</button>
                     <a href="{% url 'room_list' %}" class="btn btn-secondary w-100 mt-2">Clear Filters</a>
                 </form>
             </div>
 
-            <!-- Calendar Section -->
-            <div class="sidebar mt-4">
-                <h5 class="text-primary fw-bold mb-4">Booking Calendar</h5>
-                <!-- Calendar container -->
-                <div id="calendar"></div>
-            </div>
+    
+
+
+
+
+
+            
         </div>
 
         <!-- Main Content -->
@@ -138,6 +142,10 @@
                                         Actions
                                     </button>
                                     <ul class="dropdown-menu">
+
+                                        <a href="{% url 'room_calendar' room.id %}" class="btn btn-info btn-sm">View Calendar</a> 
+
+
                                         <li><a class="dropdown-item" href="{% url 'room_detail' room.id %}">View</a></li>
                                         <li><a class="dropdown-item" href="{% url 'room_edit' room.id %}">Edit</a></li>
                                         <li>

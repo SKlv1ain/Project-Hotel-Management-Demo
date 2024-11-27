@@ -33,7 +33,6 @@ def dashboard(request):
         return redirect('login')
     return render(request, 'core/dashboard.html')
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     
