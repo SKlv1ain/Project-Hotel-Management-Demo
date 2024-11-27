@@ -5,10 +5,6 @@ from django.shortcuts import render, redirect
 from .forms import BookingForm, RoomForm, PaymentForm, CustomerForm
 from django.contrib import messages
 
-
-
-
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -140,9 +136,17 @@ def room_detail(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     return render(request, 'room_detail.html', {'room': room})
 
+
 def booking_list(request):
-    bookings = Booking.objects.all()
-    return render(request, 'booking_list.html', {'bookings': bookings})
+    sort_by = request.GET.get('sort_by', 'id')  # Default sorting by booking ID
+    if sort_by == 'total_price_asc':
+        bookings = Booking.objects.order_by('total_price')
+    elif sort_by == 'total_price_desc':
+        bookings = Booking.objects.order_by('-total_price')
+    else:
+        bookings = Booking.objects.all()
+
+    return render(request, 'booking_list.html', {'bookings': bookings, 'sort_by': sort_by})
 
 
 def new_booking(request):
@@ -199,6 +203,53 @@ def payment_list(request):
     payments = Payment.objects.all()  # Fetch all payments
     return render(request, 'payment_list.html', {'payments': payments})
 
+from django.shortcuts import render
+from .models import Payment
+
+def manage_payments(request):
+    payments = Payment.objects.all()
+
+    # Sorting logic
+    sort_by = request.GET.get('sort_by', 'id')
+    if sort_by == 'amount_asc':
+        payments = payments.order_by('amount')
+    elif sort_by == 'amount_desc':
+        payments = payments.order_by('-amount')
+    elif sort_by == 'status_asc':
+        payments = payments.order_by('status')
+    elif sort_by == 'status_desc':
+        payments = payments.order_by('-status')
+
+    # Filtering logic
+    status = request.GET.get('status', 'all')
+    if status != 'all':
+        payments = payments.filter(status=status)
+
+    method = request.GET.get('method', 'all')
+    if method != 'all':
+        payments = payments.filter(payment_method=method)
+
+    # Date range filter
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    if date_from and date_to:
+        payments = payments.filter(created_at__range=[date_from, date_to])
+
+    # Analytics data
+    total_payments = payments.aggregate(total=models.Sum('amount'))['total'] or 0
+    total_confirmed = payments.filter(status='confirmed').aggregate(total=models.Sum('amount'))['total'] or 0
+    total_failed = payments.filter(status='failed').aggregate(total=models.Sum('amount'))['total'] or 0
+
+    context = {
+        'payments': payments,
+        'sort_by': sort_by,
+        'total_payments': total_payments,
+        'total_confirmed': total_confirmed,
+        'total_failed': total_failed,
+    }
+    return render(request, 'manage_payments.html', context)
+
+
 # Create Payment
 def payment_create(request):
     if request.method == 'POST':
@@ -249,9 +300,22 @@ def review_list(request):
     reviews = Review.objects.all()
     return render(request, 'review_list.html', {'reviews': reviews})
 
+
 def customer_list(request):
-    customers = Customer.objects.all()
-    return render(request, 'core/customer_list.html', {'customers': customers})
+    sort_by = request.GET.get('sort_by', 'id')  # Default sorting by customer ID
+    if sort_by == 'first_name_asc':
+        customers = Customer.objects.order_by('first_name')
+    elif sort_by == 'first_name_desc':
+        customers = Customer.objects.order_by('-first_name')
+    elif sort_by == 'last_name_asc':
+        customers = Customer.objects.order_by('last_name')
+    elif sort_by == 'last_name_desc':
+        customers = Customer.objects.order_by('-last_name')
+    else:
+        customers = Customer.objects.all()
+
+    return render(request, 'customer_list.html', {'customers': customers, 'sort_by': sort_by})
+
 
 # Create a New Customer
 def customer_create(request):

@@ -61,6 +61,17 @@
                     <th>Room</th>
                     <th>Check-In</th>
                     <th>Check-Out</th>
+                    <th>
+                        <a href="?sort_by={% if sort_by == 'total_price_asc' %}total_price_desc{% else %}total_price_asc{% endif %}" 
+                           class="text-decoration-none">
+                            Total Price
+                            {% if sort_by == 'total_price_asc' %}
+                                ↑
+                            {% elif sort_by == 'total_price_desc' %}
+                                ↓
+                            {% endif %}
+                        </a>
+                    </th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -76,10 +87,14 @@
                     <td>{{ booking.check_in_date }}</td>
                     <!-- Check-Out Date -->
                     <td>{{ booking.check_out_date }}</td>
+                    <!-- Total Price -->
+                    <td>
+                        ${{ booking.total_price }}
+                    </td>
                     <!-- Status -->
                     <td>
                         <span class="badge-status 
-                            {% if booking.status == 'confirmed' %}badge-success{% elif booking.status == 'canceled' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {% if booking.status == 'confirmed' %}badge-success{% elif booking.status == 'cancelled' %}badge-danger{% else %}badge-warning{% endif %}">
                             {{ booking.get_status_display }}
                         </span>
                     </td>
@@ -107,7 +122,7 @@
                                         <button type="submit" class="dropdown-item text-danger">Delete</button>
                                     </form>
                                 </li>
-                                {% if booking.status == 'canceled' %}
+                                {% if booking.status == 'cancelled' %}
                                 <li>
                                     <a href="{% url 'new_booking' %}?room_id={{ booking.room.id }}&check_in_date={{ booking.check_in_date }}&check_out_date={{ booking.check_out_date }}" class="dropdown-item text-primary">
                                         Rebook
@@ -120,7 +135,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted">No bookings found.</td>
+                    <td colspan="7" class="text-center text-muted">No bookings found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

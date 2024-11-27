@@ -41,8 +41,28 @@
         <table class="table table-hover">
             <thead class="table-light">
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
+                    <th>
+                        <a href="?sort_by={% if sort_by == 'first_name_asc' %}first_name_desc{% else %}first_name_asc{% endif %}" 
+                           class="text-decoration-none">
+                            First Name
+                            {% if sort_by == 'first_name_asc' %}
+                                ↑
+                            {% elif sort_by == 'first_name_desc' %}
+                                ↓
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort_by={% if sort_by == 'last_name_asc' %}last_name_desc{% else %}last_name_asc{% endif %}" 
+                           class="text-decoration-none">
+                            Last Name
+                            {% if sort_by == 'last_name_asc' %}
+                                ↑
+                            {% elif sort_by == 'last_name_desc' %}
+                                ↓
+                            {% endif %}
+                        </a>
+                    </th>
                     <th>Email</th>
                     <th>Phone Number</th>
                     <th>Actions</th>
