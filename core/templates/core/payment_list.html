@@ -1,38 +1,66 @@
-
-
 {% block content %}
-<h2>Manage Payments</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Booking</th>
-            <th>Amount</th>
-            <th>Payment Date</th>
-            <th>Payment Method</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for payment in payments %}
-        <tr>
-            <td>
-                {% if payment.booking %}
-                    {{ payment.booking.room.room_type }}
-                {% else %}
-                    No Booking
-                {% endif %}
-            </td>
-            <td>{{ payment.amount }}</td>
-            <td>{{ payment.payment_date }}</td>
-            <td>{{ payment.payment_method }}</td>
-            <td>
-                <a href="{% url 'payment_edit' payment.id %}" class="btn btn-primary">Edit</a>
-                <a href="{% url 'payment_delete' payment.id %}" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<a href="{% url 'payment_create' %}" class="btn btn-success">Create New Payment</a>
-<a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+<div class="container mt-4">
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fw-bold text-primary">Manage Payments</h2>
+            <a href="{% url 'payment_create' %}" class="btn btn-success">+ Create New Payment</a>
+        </div>
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Booking</th>
+                    <th>Amount</th>
+                    <th>Payment Date</th>
+                    <th>Payment Method</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>
+                        {% if payment.booking %}
+                            {{ payment.booking.room.room_type }}
+                        {% else %}
+                            <span class="text-muted">No Booking</span>
+                        {% endif %}
+                    </td>
+                    <td>${{ payment.amount }}</td>
+                    <td>{{ payment.payment_date }}</td>
+                    <td>{{ payment.payment_method }}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button 
+                                class="btn btn-light btn-sm dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{% url 'payment_edit' payment.id %}" class="dropdown-item">Edit</a>
+                                </li>
+                                <li>
+                                    <form method="post" action="{% url 'payment_delete' payment.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No payments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-end">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

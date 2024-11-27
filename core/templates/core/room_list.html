@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Room Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/main.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
@@ -30,13 +31,13 @@
             font-size: 14px;
             color: #6c757d;
         }
-        .badge {
-            font-size: 12px;
-        }
-        .action-dropdown {
-            cursor: pointer;
-            border: none;
-            background: none;
+        #calendar {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            width: 100%;
+            height: 400px; /* Adjust height to match the filter section */
         }
     </style>
 </head>
@@ -78,6 +79,13 @@
                     <a href="{% url 'room_list' %}" class="btn btn-secondary w-100 mt-2">Clear Filters</a>
                 </form>
             </div>
+
+            <!-- Calendar Section -->
+            <div class="sidebar mt-4">
+                <h5 class="text-primary fw-bold mb-4">Booking Calendar</h5>
+                <!-- Calendar container -->
+                <div id="calendar"></div>
+            </div>
         </div>
 
         <!-- Main Content -->
@@ -93,7 +101,17 @@
                             <th>Room ID</th>
                             <th>Type</th>
                             <th>Description</th>
-                            <th>Price</th>
+                            <th>
+                                <a href="?sort_by={% if request.GET.sort_by == 'price_asc' %}price_desc{% else %}price_asc{% endif %}" 
+                                   class="text-decoration-none">
+                                    Price
+                                    {% if request.GET.sort_by == 'price_asc' %}
+                                        ↑
+                                    {% elif request.GET.sort_by == 'price_desc' %}
+                                        ↓
+                                    {% endif %}
+                                </a>
+                            </th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -148,13 +166,33 @@
                     <button class="btn btn-secondary ms-2">Next</button>
                 </div>
             </div>
+            <div class="d-flex justify-content-end mt-3">
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
         </div>
-    </div>
-    <div class="d-flex justify-content-end mt-3">
-        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 400, // Match the height of the filter
+            events: [
+                {% for booking in bookings %}
+                {
+                    title: '{{ booking.customer.first_name }} {{ booking.customer.last_name }} - Room {{ booking.room.room_type }}',
+                    start: '{{ booking.check_in_date }}',
+                    end: '{{ booking.check_out_date|date:"Y-m-d" }}T23:59:59'
+                },
+                {% endfor %}
+            ]
+        });
+        calendar.render();
+    });
+</script>
 </body>
 </html>

@@ -60,6 +60,7 @@ urlpatterns = [
     path('customers/<int:customer_id>/delete/', views.customer_delete, name='customer_delete'),
     path('reviews/', views.review_list, name='review_list'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('rooms/', views.room_list, name='room_list'),
     
 ]
 from core.views import booking_view

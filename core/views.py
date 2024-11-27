@@ -7,6 +7,7 @@ from django.contrib import messages
 
 
 
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -53,28 +54,20 @@ def dashboard(request):
         return redirect('login')
     return render(request, 'core/dashboard.html')
 
-# def dashboard(request):
-#     return render(request, 'core/dashboard.html')
+from .models import Booking
 
-
-# code for user view
 def room_list(request):
-    # Get filter parameters from the request
-    status_filter = request.GET.get('status', 'all')  # Default to 'all'
-    search_query = request.GET.get('search', '')  # Get the search query for Room ID or Room Type
+    status_filter = request.GET.get('status', 'all')
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort_by', '')
 
-    # Start with all rooms and filter based on search query and status
     rooms = Room.objects.all()
 
-    # Apply search filter for Room ID or Room Type if provided
-# Apply search filter for Room ID or Room Type if provided
     if search_query:
         rooms = rooms.filter(
             id__icontains=search_query
-        ) | rooms.filter(room_type__icontains=search_query)  # Search by Room ID or Room Type
+        ) | rooms.filter(room_type__icontains=search_query)
 
-
-    # Apply status filter
     if status_filter == 'available':
         rooms = rooms.filter(status='available')
     elif status_filter == 'booked':
@@ -82,22 +75,22 @@ def room_list(request):
     elif status_filter == 'pending':
         rooms = rooms.filter(status='pending')
 
-    # Count for each status (optional, useful for UI)
-    status_counts = {
-        'all': Room.objects.count(),
-        'available': Room.objects.filter(status='available').count(),
-        'booked': Room.objects.filter(status='booked').count(),
-        'pending': Room.objects.filter(status='pending').count(),
-    }
+    if sort_by == 'price_asc':
+        rooms = rooms.order_by('price_per_night')
+    elif sort_by == 'price_desc':
+        rooms = rooms.order_by('-price_per_night')
 
-    # Pass context to the template
+    # Fetch all bookings for the calendar
+    bookings = Booking.objects.all()
+
     context = {
         'rooms': rooms,
         'status_filter': status_filter,
         'search_query': search_query,
-        'status_counts': status_counts,
+        'bookings': bookings,  # Pass bookings to the template
     }
     return render(request, 'core/room_list.html', context)
+
 
 
 # Create a new room
@@ -122,8 +115,6 @@ def room_edit(request, room_id):
     else:
         form = RoomForm(instance=room)
     return render(request, 'core/room_form.html', {'form': form})
-
-
 
 
 # Delete a room
@@ -159,9 +150,6 @@ def new_booking(request):
         form = BookingForm()
     
     return render(request, 'core/new_booking.html', {'form': form})
-
-
-
 
 def booking_edit(request, booking_id):
     """
