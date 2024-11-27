@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Room</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .form-container h1 {
+            font-size: 24px;
+            color: #343a40;
+            text-align: center;
+        }
+        .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .form-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Create Room</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="roomName" class="form-label">Room Name</label>
+                <input type="text" id="roomName" name="room_name" class="form-control" placeholder="Enter room name" required>
+            </div>
+            <div class="mb-3">
+                <label for="roomType" class="form-label">Room Type</label>
+                <input type="text" id="roomType" name="room_type" class="form-control" placeholder="Enter room type" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="description" class="form-control" rows="3" placeholder="Write a short description" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price per Night</label>
+                <input type="number" id="price" name="price" class="form-control" placeholder="Enter price in USD" min="0" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Create Room</button>
+        </form>
+    </div>
+</body>
+</html>
+
+
