@@ -60,7 +60,8 @@ def room_list(request):
     # Get filter parameters from the request
     status_filter = request.GET.get('status', 'all')  # Default to 'all'
     search_query = request.GET.get('search', '')  # Get the search query for Room ID or Room Type
-
+    sort_by = request.GET.get('sort_by', '')  # Get the sort parameter
+    
     # Start with all rooms
     rooms = Room.objects.all()
 
@@ -69,6 +70,12 @@ def room_list(request):
         rooms = rooms.filter(
             id__icontains=search_query
         ) | rooms.filter(room_type__icontains=search_query)
+        
+    # Apply sorting based on price
+    if sort_by == 'price_asc':
+        rooms = rooms.order_by('price_per_night')  # Sort by price (ascending)
+    elif sort_by == 'price_desc':
+        rooms = rooms.order_by('-price_per_night')  # Sort by price (descending)
 
     # Apply status filter
     if status_filter == 'available':
@@ -94,8 +101,6 @@ def room_list(request):
         'status_counts': status_counts,
     }
     return render(request, 'core/room_list.html', context)
-
-
 
 
 # Create a new room
@@ -138,7 +143,6 @@ def room_detail(request, room_id):
 def booking_list(request):
     bookings = Booking.objects.all()
     return render(request, 'booking_list.html', {'bookings': bookings})
-
 
 
 def new_booking(request):
