@@ -5,6 +5,12 @@
 
 A Django-based web application for managing hotel operations, including room management, bookings, payments, customer management, and reviews. This project provides a user-friendly interface for both customers and administrators, enabling seamless hotel management.
 
+## MEMBEER
+- Sai Khun Main 6510545373
+
+- Thanutham CHONSONGKRAM    6510545438
+
+- Peerawat THEERASAKUL  6610545880
 ---
 
 ## Features
