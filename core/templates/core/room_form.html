@@ -25,21 +25,6 @@
             font-weight: bold;
             margin-bottom: 20px;
         }
-        .form-container .form-label {
-            font-weight: bold;
-            font-size: 14px;
-            color: #343a40;
-        }
-        .form-container .form-control {
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ced4da;
-        }
-        .form-container .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
         .form-container button[type="submit"] {
             background-color: #007bff;
             color: white;
@@ -54,43 +39,11 @@
         .form-container button[type="submit"]:hover {
             background-color: #0056b3;
         }
-        .form-container .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            width: 100%;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
-        }
-        .form-container .btn-secondary:hover {
-            background-color: #565e64;
-        }
-        .form-container .form-group {
-            margin-bottom: 20px;
-        }
-        .form-container textarea {
-            resize: none;
-        }
-        .back-link {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .back-link a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        .back-link a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h1>Room Form</h1>
+        <h1>Create Room</h1>
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
@@ -104,14 +57,6 @@
             <div class="form-group">
                 <label for="price_per_night" class="form-label">Price per Night</label>
                 <input type="number" name="price_per_night" id="price_per_night" class="form-control" value="{{ form.price_per_night.value|default:'' }}">
-            </div>
-            <div class="form-group">
-                <label for="status" class="form-label">Status</label>
-                <select name="status" id="status" class="form-control">
-                    {% for choice in form.status.field.choices %}
-                        <option value="{{ choice.0 }}" {% if form.status.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                    {% endfor %}
-                </select>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>

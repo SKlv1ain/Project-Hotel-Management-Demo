@@ -3,37 +3,17 @@ from django.contrib import admin  # Corrected import statement
 from .models import Room, Booking, Customer, Payment
 from django.utils import timezone
 
-class RoomForm(forms.ModelForm):    
-    check_in_date = forms.DateField(
-        required=False, 
-        widget=forms.SelectDateWidget(years=range(2024, 2026)),
-        initial=None  # Default value set to None
-    )
-    check_out_date = forms.DateField(
-        required=False, 
-        widget=forms.SelectDateWidget(years=range(2024, 2026)),
-        initial=None  # Default value set to None
-    )
-
-
+class RoomForm(forms.ModelForm):
     class Meta:
         model = Room
-        fields = ['room_type', 'description', 'price_per_night', 'status']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        check_in_date = cleaned_data.get('check_in_date')
-        check_out_date = cleaned_data.get('check_out_date')
-
-        # Ensure check-in and check-out dates are provided
-        if check_in_date and check_out_date:
-            # Check availability for the given dates
-            room = self.instance
-            if not room.is_available(check_in_date, check_out_date):
-                raise forms.ValidationError("This room is not available for the selected dates.")
-        return cleaned_data
-
-
+        fields = ['room_type', 'description', 'price_per_night']  # Removed 'status'
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.status = 'available'  # Automatically set status to 'available'
+        if commit:
+            instance.save()
+        return instance
 
 
 class BookingForm(forms.ModelForm):
@@ -98,6 +78,8 @@ class BookingForm(forms.ModelForm):
                 self.instance.total_price = room.price_per_night * duration
             else:
                 raise ValueError("Check-out date must be after check-in date.")
+
+
 
 
 class BookingAdmin(admin.ModelAdmin):

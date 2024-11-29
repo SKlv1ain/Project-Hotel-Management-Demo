@@ -99,16 +99,20 @@ def room_list(request):
     return render(request, 'core/room_list.html', context)
 
 
-# Create a new room
 def room_create(request):
     if request.method == 'POST':
         form = RoomForm(request.POST)
         if form.is_valid():
-            form.save()
+            form.save()  # The form automatically sets the status to 'available'
+            messages.success(request, "Room created successfully!")
             return redirect('room_list')
     else:
         form = RoomForm()
     return render(request, 'core/room_form.html', {'form': form})
+
+
+
+
 
 # Edit an existing room
 def room_edit(request, room_id):
@@ -153,18 +157,14 @@ def new_booking(request):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            booking = form.save(commit=False)
-            # Check availability before saving
-            if check_room_availability(booking.room, booking.check_in_date, booking.check_out_date):
-                booking.save()
-                messages.success(request, "Booking confirmed successfully!")
-                return redirect('booking_list')
-            else:
-                messages.error(request, "Room is not available for the selected dates.")
+            form.save()  # The form automatically sets the status to 'pending'
+            messages.success(request, "Booking created successfully with status 'Pending'!")
+            return redirect('booking_list')
     else:
         form = BookingForm()
     
     return render(request, 'core/new_booking.html', {'form': form})
+
 
 def booking_edit(request, booking_id):
     """
