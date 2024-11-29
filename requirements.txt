@@ -1,0 +1,7 @@
+
+pip freeze > requirements.txt
+
+Django==4.2
+djangorestframework==3.14.0
+gunicorn==20.1.0
+psycopg2-binary==2.9.7
